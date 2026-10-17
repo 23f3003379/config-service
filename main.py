@@ -88,3 +88,15 @@ def effective_config(set_params: list[str] = Query(default=[], alias="set")):
     result["api_key"] = "****"
     order = ["port", "workers", "debug", "log_level", "api_key"]
     return {**{k: result[k] for k in order}, **{k: v for k, v in result.items() if k not in order}}
+
+
+@app.get("/debug-layers")
+def debug_layers():
+    return {
+        "yaml_file_exists": (BASE / f"config.{APP_ENV}.yaml").exists(),
+        "yaml": load_yaml(),
+        "dotenv_file_exists": (BASE / ".env").exists(),
+        "dotenv": load_dotenv(),
+        "os_env": load_os_env(),
+        "files_in_folder": sorted(p.name for p in BASE.iterdir()),
+    }
